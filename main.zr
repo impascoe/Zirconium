@@ -1,3 +1,7 @@
 func main() int {
     return 10;
 }
+
+func foo() int {
+    return 20;
+}
