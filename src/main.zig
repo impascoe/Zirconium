@@ -19,9 +19,4 @@ pub fn main() !void {
         const token = result[i];
         std.debug.print("{}\n", .{token});
     }
-
-    // switch (result) {
-    //     .
-    // }
-    // std.debug.print("{any}", .{result});
 }
