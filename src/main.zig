@@ -13,5 +13,13 @@ pub fn main() !void {
     const file_path = args[1];
 
     const result = try tokenizer.tokenize(file_path);
-    std.debug.print("{s}", .{result});
+    var i: usize = 0;
+    while (i < result.len) : (i += 1) {
+        const token = result[i];
+        std.debug.print("{any}", .{token});
+    }
+    // switch (result) {
+    //     .
+    // }
+    // std.debug.print("{any}", .{result});
 }

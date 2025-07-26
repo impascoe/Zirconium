@@ -1,6 +1,8 @@
 const std = @import("std");
+const Token = @import("tokens.zig").Token;
+const TokenType = Token.Type;
 
-pub fn tokenize(file_path: []const u8) ![]const u8 {
+pub fn tokenize(file_path: []const u8) ![]Token {
     const file = try std.fs.cwd().openFile(file_path, .{});
     defer file.close();
 
@@ -13,36 +15,44 @@ pub fn tokenize(file_path: []const u8) ![]const u8 {
         return error.IncompleteRead;
     }
 
-    var tokens = std.ArrayList(u8).init(std.heap.page_allocator);
+    var tokens = std.ArrayList(Token).init(std.heap.page_allocator);
     defer tokens.deinit();
     var position: usize = 0;
 
     while (position < input.len) {
-        const current = input[position];
+        const current: u8 = input[position];
 
-        if (std.ascii.isAlphanumeric(current)) {
-            if (std.ascii.isAlphabetic(current)) {}
-            std.debug.print("{c}", .{current});
-        } else if (std.ascii.isWhitespace(current)) {
-            std.debug.print("{c}", .{current});
-        } else {
-            if (current == '(') {
-                std.debug.print("{c}", .{current});
-            }
-            if (current == ')') {
-                std.debug.print("{c}", .{current});
-            }
-            if (current == '{') {
-                std.debug.print("{c}", .{current});
-            }
-            if (current == '}') {
-                std.debug.print("{c}", .{current});
-            }
-            if (current == ';') {
-                std.debug.print("{c}", .{current});
-            }
+        switch (current) {
+            '0'...'9' => {
+                try tokens.append(get_token_int(input, &position));
+                continue; // position already updated in get_token_int
+            },
+            ' ' => try tokens.append(Token{ .type = .Whitespace }),
+            '\t' => try tokens.append(Token{ .type = .Whitespace }),
+            '\n' => try tokens.append(Token{ .type = .Whitespace }),
+            '\r' => try tokens.append(Token{ .type = .Whitespace }),
+            '(' => try tokens.append(Token{ .type = .LeftParenthesis }),
+            ')' => try tokens.append(Token{ .type = .RightParenthesis }),
+            '{' => try tokens.append(Token{ .type = .LeftBrace }),
+            '}' => try tokens.append(Token{ .type = .RightBrace }),
+            ';' => try tokens.append(Token{ .type = .Semicolon }),
+            else => try tokens.append(Token{ .type = .Unknown }),
         }
         position += 1;
     }
+
+    tokens.append(Token{ .type = .{ .Identifier = "test" } }) catch unreachable;
+    tokens.append(Token{ .type = .EOF }) catch unreachable;
     return tokens.toOwnedSlice();
+}
+
+fn get_token_int(input: []const u8, position: *usize) Token {
+    var value: usize = 0;
+    while (true) {
+        const current = input[*position];
+        if (!std.ascii.isDigit(current)) break;
+        value = value * 10 + (current - '0');
+        position.* += 1;
+    }
+    return Token{ .type = .{ .Int = value } };
 }
