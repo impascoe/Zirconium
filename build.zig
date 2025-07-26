@@ -15,6 +15,13 @@ pub fn build(b: *std.Build) void {
     // set a preferred release mode, allowing the user to decide how to optimize.
     const optimize = b.standardOptimizeOption(.{});
 
+    const llvm_dep = b.dependency("llvm", .{ // <== as declared in build.zig.zon
+        .target = target, // the same as passing `-Dtarget=<...>` to the library's build.zig script
+        .optimize = optimize, // ditto for `-Doptimize=<...>`
+    });
+
+    const llvm_mod = llvm_dep.module("llvm");
+    const clang_mod = llvm_dep.module("clang");
     // This creates a "module", which represents a collection of source files alongside
     // some compilation options, such as optimization mode and linked system libraries.
     // Every executable or library we compile will be based on one or more modules.
@@ -45,6 +52,8 @@ pub fn build(b: *std.Build) void {
         .root_module = exe_mod,
     });
 
+    exe.root_module.addImport("llvm", llvm_mod); // <== add llvm module
+    exe.root_module.addImport("clang", clang_mod);
     // This declares intent for the executable to be installed into the
     // standard location when the user invokes the "install" step (the default
     // step when running `zig build`).

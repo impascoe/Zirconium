@@ -5,7 +5,7 @@ pub const Token = struct {
 };
 
 pub const Type = union(enum) {
-    Int: u32,
+    Int: u8,
     Identifier: []const u8,
     LeftParenthesis,
     RightParenthesis,
