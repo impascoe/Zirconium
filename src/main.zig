@@ -1,5 +1,6 @@
 const std = @import("std");
 const tokenizer = @import("tokenizer.zig");
+const Parser = @import("parser.zig").Parser;
 
 pub fn main() !void {
     const args = try std.process.argsAlloc(std.heap.page_allocator);
@@ -14,14 +15,14 @@ pub fn main() !void {
 
     const result = try tokenizer.tokenize(file_path);
     defer tokenizer.freeTokens(result);
-    var i: usize = 0;
-    while (i < result.len) : (i += 1) {
-        const token = result[i];
-        std.debug.print("{}\n", .{token});
-    }
 
-    // switch (result) {
-    //     .
+    var ast = Parser.init(result);
+    const ast_ = try ast.parse();
+    std.debug.print("{}\n", .{ast_});
+
+    // var i: usize = 0;
+    // while (i < result.len) : (i += 1) {
+    //     const token = result[i];
+    //     std.debug.print("{}\n", .{token});
     // }
-    // std.debug.print("{any}", .{result});
 }
