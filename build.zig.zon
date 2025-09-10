@@ -36,10 +36,6 @@
     // Once all dependencies are fetched, `zig build` no longer requires
     // internet connectivity.
     .dependencies = .{
-        .llvm = .{
-            .url = "git+https://github.com/kassane/llvm-zig#1f587a286f3b5d3bc2b6ecaae6655bddfc86120a",
-            .hash = "llvm_zig-1.0.0-IXgkxOJiBACZm15g-MVcLK9RygKIMBAD04sSjEFGjBQZ",
-        },
     },
     .paths = .{
         "build.zig",
