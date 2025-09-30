@@ -22,7 +22,7 @@ Implemented so far (see `src/`):
 
 ---
 
-## 🔬 Example
+## Code Example
 
 `main.zr` (included):
 
