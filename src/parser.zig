@@ -50,14 +50,14 @@ pub const Parser = struct {
     }
 
     fn parseProgram(self: *Parser) !ast.ProgNode {
-        var functions = std.ArrayList(ast.FuncNode).init(std.heap.page_allocator);
-        defer functions.deinit();
+        var functions = std.ArrayList(ast.FuncNode).empty;
+        defer functions.deinit(std.heap.page_allocator);
         while (self.peek().type != TokenType.EOF) {
             const function = try self.parseFunction();
-            try functions.append(function);
+            try functions.append(std.heap.page_allocator, function);
         }
         return ast.ProgNode{
-            .func_nodes = try functions.toOwnedSlice(),
+            .func_nodes = try functions.toOwnedSlice(std.heap.page_allocator),
         };
     }
 
@@ -79,7 +79,7 @@ pub const Parser = struct {
             if (self.isToken(.RightParenthesis)) {
                 _ = self.advance(); // consume ")"
             }
-            std.debug.print("token: {s}\n", .{self.peek()});
+            std.debug.print("token found: ({f})\n", .{self.peek()});
             // consume return type value
             var return_type: []const u8 = "";
             if (self.getCurrentIdentifier()) |ret_type| {
@@ -90,7 +90,7 @@ pub const Parser = struct {
 
             const body = try self.parseBlock();
 
-            std.debug.print("token: {s}\n", .{self.peek()});
+            std.debug.print("token found: ({f})\n", .{self.peek()});
 
             // Continue parsing...
             return ast.FuncNode{
@@ -99,14 +99,14 @@ pub const Parser = struct {
                 .body = body,
             };
         } else {
-            std.debug.print("Unexpected token: {s}\n", .{self.peek()});
+            std.debug.print("Unexpected token found: ({f})\n", .{self.peek()});
             return error.UnexpectedToken;
         }
     }
 
     fn parseBlock(self: *Parser) !ast.BlockNode {
-        var statements = std.ArrayList(ast.StmtNode).init(std.heap.page_allocator);
-        defer statements.deinit();
+        var statements = std.ArrayList(ast.StmtNode).empty;
+        defer statements.deinit(std.heap.page_allocator);
 
         // Expect opening brace
         if (self.isToken(.LeftBrace)) {
@@ -116,7 +116,7 @@ pub const Parser = struct {
         // Parse statements until closing brace
         while (!self.isToken(.RightBrace) and !self.isAtEnd()) {
             const stmt = try self.parseStatement();
-            try statements.append(stmt);
+            try statements.append(std.heap.page_allocator, stmt);
         }
 
         // Expect closing brace
@@ -125,7 +125,7 @@ pub const Parser = struct {
         }
 
         return ast.BlockNode{
-            .statements = try statements.toOwnedSlice(),
+            .statements = try statements.toOwnedSlice(std.heap.page_allocator),
         };
     }
 
@@ -239,10 +239,10 @@ test "parse function declaration" {
         Token{ .type = .RightBrace },
         Token{ .type = .EOF },
     };
-    std.debug.print("{s}\n", .{test_tokens});
+    std.debug.print("{any}\n", .{test_tokens});
     var parser = Parser.init(&test_tokens);
     const ast_ = try parser.parseProgram();
-    std.debug.print("{s}\n", .{ast_});
+    std.debug.print("{any}\n", .{ast_});
     // Add your test assertions here
 }
 

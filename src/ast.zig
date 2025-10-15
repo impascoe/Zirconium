@@ -3,16 +3,11 @@ const std = @import("std");
 pub const ProgNode = struct {
     func_nodes: []FuncNode,
 
-    pub fn format(
-        self: @This(),
-        comptime fmt: []const u8,
-        options: std.fmt.FormatOptions,
-        writer: anytype,
-    ) !void {
-        _ = fmt;
-        _ = options;
-
-        try writer.print("Program (\n{s}\n)", .{self.func_nodes});
+    pub fn format(self: @This(), writer: anytype) !void {
+        try writer.print("Program:\n", .{});
+        for (self.func_nodes) |func| {
+            try func.format(writer, .{});
+        }
     }
 };
 
@@ -23,30 +18,29 @@ pub const FuncNode = struct {
 
     pub fn format(
         self: @This(),
-        comptime fmt: []const u8,
-        options: std.fmt.FormatOptions,
         writer: anytype,
+        _: std.fmt.FormatOptions,
     ) !void {
-        _ = fmt;
-        _ = options;
-
-        try writer.print("\tFunction (\n\tname=\"{s}\",\n\treturn type={s}\n", .{ self.func_name, self.return_type });
-        try writer.print("\tbody={s}\n\t)\n", .{self.body});
+        try writer.print("\tFunction (\n\tname=\"{s}\",\n\treturn type={s}\n", .{
+            self.func_name, self.return_type,
+        });
+        try writer.print("\tbody=", .{});
+        try self.body.format(writer, .{});
+        try writer.print("\n\t)\n", .{});
     }
 };
 
 pub const BlockNode = struct {
-    statements: []StmtNode, // Array of statements (can be empty)
+    statements: []StmtNode,
 
     pub fn format(
         self: @This(),
-        comptime fmt: []const u8,
-        options: std.fmt.FormatOptions,
         writer: anytype,
+        fmt: std.fmt.FormatOptions,
     ) !void {
         try writer.print("Block (\n", .{});
         for (self.statements) |stmt| {
-            try stmt.format(fmt, options, writer); // Call the statement's format method
+            try stmt.format(writer, fmt);
         }
         try writer.print("\t)", .{});
     }
@@ -54,27 +48,26 @@ pub const BlockNode = struct {
 
 pub const StmtNode = union(enum) {
     Expression: ExprNode,
-    Return: ?ExprNode, // Return with optional expression
-    Empty, // Explicit empty statement
+    Return: ?ExprNode,
+    Empty,
 
     pub fn format(
         self: @This(),
-        comptime fmt: []const u8,
-        options: std.fmt.FormatOptions,
         writer: anytype,
+        fmt: std.fmt.FormatOptions,
     ) !void {
         switch (self) {
             .Expression => |expr| {
                 try writer.print("\t\tStatement (\n\t\ttype=Expression\n", .{});
                 try writer.print("\t\t\t", .{});
-                try expr.format(fmt, options, writer);
+                try expr.format(writer, fmt);
                 try writer.print("\n\t\t)\n", .{});
             },
             .Return => |maybe_expr| {
                 try writer.print("\t\tStatement (\n\t\ttype=Return\n", .{});
                 if (maybe_expr) |expr| {
                     try writer.print("\t\t\t", .{});
-                    try expr.format(fmt, options, writer);
+                    try expr.format(writer, fmt);
                 } else {
                     try writer.print("\t\t\tvoid return", .{});
                 }
@@ -90,13 +83,9 @@ pub const ExprNode = struct {
 
     pub fn format(
         self: @This(),
-        comptime fmt: []const u8,
-        options: std.fmt.FormatOptions,
         writer: anytype,
+        _: std.fmt.FormatOptions,
     ) !void {
-        _ = fmt;
-        _ = options;
-
         try writer.print("Expression (\n\t\t\t\tvalue={d}\n\t\t\t)", .{self.value});
     }
 };

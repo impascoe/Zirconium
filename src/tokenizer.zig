@@ -16,8 +16,8 @@ pub fn tokenize(file_path: []const u8) ![]Token {
         return error.IncompleteRead;
     }
 
-    var tokens = std.ArrayList(Token).init(std.heap.page_allocator);
-    defer tokens.deinit();
+    var tokens = std.ArrayList(Token).empty;
+    defer tokens.deinit(std.heap.page_allocator);
     var position: usize = 0;
 
     while (position < input.len) {
@@ -32,7 +32,7 @@ pub fn tokenize(file_path: []const u8) ![]Token {
             const identifier_slice = input[start_pos..position];
             const identifier_copy = try std.heap.page_allocator.dupe(u8, identifier_slice);
             print("Parsed identifier: {s}\n", .{identifier_copy});
-            try tokens.append(Token{ .type = .{ .Identifier = identifier_copy } });
+            try tokens.append(std.heap.page_allocator, Token{ .type = .{ .Identifier = identifier_copy } });
         } else if (std.ascii.isDigit(current)) {
             var value: u8 = current - '0';
             position += 1;
@@ -42,24 +42,24 @@ pub fn tokenize(file_path: []const u8) ![]Token {
                 position += 1;
             }
             print("Parsed integer: {}\n", .{value});
-            try tokens.append(Token{ .type = .{ .Int = value } });
+            try tokens.append(std.heap.page_allocator, Token{ .type = .{ .Int = value } });
         } else if (std.ascii.isWhitespace(current)) {
             position += 1;
             continue;
         } else {
             switch (current) {
-                '(' => try tokens.append(Token{ .type = .LeftParenthesis }),
-                ')' => try tokens.append(Token{ .type = .RightParenthesis }),
-                '{' => try tokens.append(Token{ .type = .LeftBrace }),
-                '}' => try tokens.append(Token{ .type = .RightBrace }),
-                ';' => try tokens.append(Token{ .type = .Semicolon }),
-                else => try tokens.append(Token{ .type = .Unknown }),
+                '(' => try tokens.append(std.heap.page_allocator, Token{ .type = .LeftParenthesis }),
+                ')' => try tokens.append(std.heap.page_allocator, Token{ .type = .RightParenthesis }),
+                '{' => try tokens.append(std.heap.page_allocator, Token{ .type = .LeftBrace }),
+                '}' => try tokens.append(std.heap.page_allocator, Token{ .type = .RightBrace }),
+                ';' => try tokens.append(std.heap.page_allocator, Token{ .type = .Semicolon }),
+                else => try tokens.append(std.heap.page_allocator, Token{ .type = .Unknown }),
             }
             position += 1;
         }
     }
-    tokens.append(Token{ .type = .EOF }) catch unreachable;
-    return tokens.toOwnedSlice();
+    tokens.append(std.heap.page_allocator, Token{ .type = .EOF }) catch unreachable;
+    return tokens.toOwnedSlice(std.heap.page_allocator);
 }
 
 pub fn freeTokens(tokens: []Token) void {

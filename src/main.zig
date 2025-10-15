@@ -17,8 +17,8 @@ pub fn main() !void {
     defer tokenizer.freeTokens(result);
 
     var ast = Parser.init(result);
-    const ast_ = try ast.parse();
-    std.debug.print("{}\n", .{ast_});
+    const program_ast = try ast.parse();
+    std.debug.print("program_ast: {f}\n", .{program_ast});
 
     // var i: usize = 0;
     // while (i < result.len) : (i += 1) {

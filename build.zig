@@ -48,6 +48,11 @@ pub fn build(b: *std.Build) void {
     // step when running `zig build`).
     b.installArtifact(exe);
 
+    const exe_check = b.addExecutable(.{
+        .name = "ZirconiumCheck",
+        .root_module = exe_mod,
+    });
+
     // This *creates* a Run step in the build graph, to be executed when another
     // step is evaluated that depends on it. The next line below will establish
     // such a dependency.
@@ -68,6 +73,10 @@ pub fn build(b: *std.Build) void {
     // This creates a build step. It will be visible in the `zig build --help` menu,
     // and can be selected like this: `zig build run`
     // This will evaluate the `run` step rather than the default, which is "install".
+
+    const check = b.step("check", "Check the app");
+    check.dependOn(&exe_check.step);
+
     const run_step = b.step("run", "Run the app");
     run_step.dependOn(&run_cmd.step);
 
