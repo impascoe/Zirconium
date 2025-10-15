@@ -3,5 +3,9 @@ func main() int {
 }
 
 func foo() int {
-    return 20;
+    return;
+}
+
+func foo() int {
+    return;
 }

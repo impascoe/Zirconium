@@ -15,6 +15,7 @@ pub const ProgNode = struct {
 
 pub const FuncNode = struct {
     func_name: []const u8,
+    func_params: []const u8,
     return_type: []const u8,
     body: BlockNode,
 
@@ -23,8 +24,8 @@ pub const FuncNode = struct {
         writer: anytype,
         fmt: std.fmt.FormatOptions,
     ) !void {
-        try writer.print("\tFunction (\n\t\tname=\"{s}\",\n\t\treturn type={s}\n", .{
-            self.func_name, self.return_type,
+        try writer.print("\tFunction (\n\t\tname=\"{s}\",\n\t\tparams=\"{s}\",\n\t\treturn type={s}\n", .{
+            self.func_name, self.func_params, self.return_type,
         });
         try writer.print("\t\tbody=", .{});
         try self.body.format(writer, fmt);

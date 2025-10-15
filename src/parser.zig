@@ -94,6 +94,7 @@ pub const Parser = struct {
             // Continue parsing...
             return ast.FuncNode{
                 .func_name = func_name,
+                .func_params = "", // Placeholder for parameters
                 .return_type = return_type,
                 .body = body,
             };

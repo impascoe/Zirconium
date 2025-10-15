@@ -1,5 +1,6 @@
 const std = @import("std");
 const tokenizer = @import("tokenizer.zig");
+const type_checker = @import("type_checker.zig");
 const Parser = @import("parser.zig").Parser;
 
 pub fn main() !void {
@@ -20,6 +21,9 @@ pub fn main() !void {
     const program_ast = try ast.parse();
     std.debug.print("program_ast: {f}\n", .{program_ast});
 
+    _ = type_checker.TypeChecker.check(program_ast) catch |err| {
+        std.debug.print("Type checking error: {any}\n", .{err});
+    };
     // var i: usize = 0;
     // while (i < result.len) : (i += 1) {
     //     const token = result[i];
