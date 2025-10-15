@@ -54,8 +54,6 @@ Program (
 )
 ```
 
-(The AST formatting currently uses `{s}` in places where a custom formatter is needed; this will improve.)
-
 ---
 
 ## Roadmap (Short / Medium Term)
@@ -90,7 +88,7 @@ zig build run -- file.zr
 zig build test       # runs unit tests
 ```
 
-Recommended Zig: `>= 0.14.0` (see `build.zig.zon`).
+Required Zig Version: `>= 0.15.0` (see `build.zig.zon`).
 
 ---
 
@@ -113,7 +111,6 @@ Planned additions:
 
 | Item | Notes |
 |------|-------|
-| Formatting `{s}` misuse | Some custom `format` impls hand invalid types to `{s}` (will fix to proper iteration). |
 | Error surface | Panics / broad `error.UnexpectedToken`; need structured diagnostics. |
 | Memory mgmt | Per-identifier allocation; migrate to arenas. |
 | Return type capture | Unvalidated; treat as raw identifier. |

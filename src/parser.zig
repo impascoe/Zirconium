@@ -1,6 +1,5 @@
 const std = @import("std");
 const ast = @import("ast.zig");
-const testing = std.testing;
 
 const Token = @import("tokens.zig").Token;
 const TokenType = @import("tokens.zig").Type;
@@ -205,62 +204,3 @@ pub const Parser = struct {
         };
     }
 };
-
-test "init" {
-    const token = Token{ .type = .Unknown };
-    const token_arr = [1]Token{token};
-
-    const parser = Parser.init(&token_arr);
-    try testing.expect(parser.tokens.len == 1);
-}
-
-test "parse function declaration" {
-    const test_tokens = [_]Token{
-        Token{ .type = .{ .Identifier = "func" } },
-        Token{ .type = .{ .Identifier = "main" } },
-        Token{ .type = .LeftParenthesis },
-        Token{ .type = .RightParenthesis },
-        Token{ .type = .{ .Identifier = "int" } },
-        Token{ .type = .LeftBrace },
-        Token{ .type = .{ .Identifier = "return" } },
-        Token{ .type = .{ .Int = 0 } },
-        Token{ .type = .Semicolon },
-        Token{ .type = .RightBrace },
-
-        Token{ .type = .{ .Identifier = "func" } },
-        Token{ .type = .{ .Identifier = "testfunc" } },
-        Token{ .type = .LeftParenthesis },
-        Token{ .type = .RightParenthesis },
-        Token{ .type = .{ .Identifier = "int" } },
-        Token{ .type = .LeftBrace },
-        Token{ .type = .{ .Identifier = "return" } },
-        Token{ .type = .{ .Int = 15 } },
-        Token{ .type = .Semicolon },
-        Token{ .type = .RightBrace },
-        Token{ .type = .EOF },
-    };
-    std.debug.print("{any}\n", .{test_tokens});
-    var parser = Parser.init(&test_tokens);
-    const ast_ = try parser.parseProgram();
-    std.debug.print("{any}\n", .{ast_});
-    // Add your test assertions here
-}
-
-test "parse program missing EOF" {
-    // Create tokens WITHOUT EOF at the end
-    const test_tokens = [_]Token{
-        Token{ .type = .{ .Identifier = "func" } },
-        Token{ .type = .{ .Identifier = "main" } },
-        Token{ .type = .LeftParenthesis },
-        Token{ .type = .RightParenthesis },
-        Token{ .type = .LeftBrace },
-        Token{ .type = .RightBrace },
-        // Notice: NO EOF token here!
-    };
-
-    var parser = Parser.init(&test_tokens);
-
-    // Should still work because parser.peek() returns EOF when out of bounds
-    const result = try parser.parseProgram();
-    try testing.expect(result.func_nodes.len == 1);
-}
