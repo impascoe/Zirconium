@@ -19,13 +19,13 @@ pub const FuncNode = struct {
     pub fn format(
         self: @This(),
         writer: anytype,
-        _: std.fmt.FormatOptions,
+        fmt: std.fmt.FormatOptions,
     ) !void {
         try writer.print("\tFunction (\n\tname=\"{s}\",\n\treturn type={s}\n", .{
             self.func_name, self.return_type,
         });
         try writer.print("\tbody=", .{});
-        try self.body.format(writer, .{});
+        try self.body.format(writer, fmt);
         try writer.print("\n\t)\n", .{});
     }
 };

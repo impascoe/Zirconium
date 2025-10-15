@@ -1,6 +1,6 @@
 # Zirconium (.zr)
 
-Zirconium is an experimental, pre-alpha programming language implemented in Zig.  
+Zirconium is an experimental, pre-alpha programming language implemented in Zig.
 Current focus: building a minimal end‑to‑end pipeline (tokenizer ➜ parser ➜ AST + debug output) for very small function-based programs.
 
 > Status: Early prototype. There is no executor / interpreter / VM / type checker yet. The tool currently parses a subset of function declarations and simple return statements from `.zr` source files and prints an AST-ish debug representation.
@@ -62,7 +62,7 @@ Program (
 
 Short-term (parsing core):
 
-- [ ] Fix AST formatting (replace `{s}` misuse; implement proper slice iteration)
+- [x] Fix AST formatting (replace `{s}` misuse; implement proper slice iteration)
 - [ ] Add function parameter list parsing (even if ignored)
 - [ ] Add simple expression grammar (binary: `+ - * /`)
 - [ ] Introduce variable declarations (`let` / `var` or `int`, `char` etc.)
